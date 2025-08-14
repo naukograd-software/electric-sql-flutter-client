@@ -1,37 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Config (override via env)
+# --- Constants matching Electric's docker-compose.yaml ---
+# See: https://github.com/electric-sql/electric/blob/main/website/public/docker-compose.yaml
 COMPOSE_FILE=${COMPOSE_FILE:-docker-compose.yaml}
 DB_SERVICE=${DB_SERVICE:-postgres}
-DB_NAME=${DB_NAME:-postgres}
+DB_NAME=${DB_NAME:-electric}
 DB_USER=${DB_USER:-postgres}
-TABLE=${TABLE:-widgets}
-INTERVAL=${INTERVAL:-2}
-
-# Local psql settings (used when not running via docker)
 PGHOST=${PGHOST:-localhost}
-PGPORT=${PGPORT:-5432}
+PGPORT=${PGPORT:-54321}
 PGUSER=${PGUSER:-${DB_USER}}
-# PGPASSWORD can be provided from env if needed
+PGPASSWORD=${PGPASSWORD:-password}
+TABLE=${TABLE:-public.widgets}
+INTERVAL=${INTERVAL:-2}
+USE_DOCKER=${USE_DOCKER:-1}
 
 log() { echo "[seed-worker] $*"; }
 
 run_psql() {
-  # $1 = SQL
-  if [[ "${USE_DOCKER:-auto}" != "0" ]] && command -v docker >/dev/null 2>&1; then
-    if docker compose -f "${COMPOSE_FILE}" ps "${DB_SERVICE}" >/dev/null 2>&1; then
-      docker compose -f "${COMPOSE_FILE}" exec -T "${DB_SERVICE}" \
-        psql -U "${DB_USER}" -d "${DB_NAME}" -c "$1"
-      return $?
-    fi
-  fi
-  # Local psql fallback
-  PGPASSWORD="${PGPASSWORD:-}" psql -h "${PGHOST}" -p "${PGPORT}" -U "${PGUSER}" -d "${DB_NAME}" -c "$1"
+  local sql="$1"
+  PGPASSWORD="${PGPASSWORD}" psql -h "${PGHOST}" -p "${PGPORT}" -U "${PGUSER}" -d "${DB_NAME}" -c "$sql"
 }
 
-log "Target table: ${TABLE} (db=${DB_NAME} user=${DB_USER})"
-log "Interval: ${INTERVAL}s"
+log "compose=${COMPOSE_FILE} service=${DB_SERVICE} db=${DB_NAME} user=${DB_USER}"
+log "table=${TABLE} interval=${INTERVAL}s docker=${USE_DOCKER}"
 
 create_sql="CREATE TABLE IF NOT EXISTS ${TABLE} (id SERIAL PRIMARY KEY, name TEXT NOT NULL, priority INT NOT NULL DEFAULT 10);"
 run_psql "${create_sql}" >/dev/null

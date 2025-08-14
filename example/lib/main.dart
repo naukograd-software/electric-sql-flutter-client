@@ -37,7 +37,7 @@ class _HomePageState extends State<HomePage> {
   late final Shape _shape;
   late final DatabaseFactory _dbFactory;
   Database? _db;
-  List<Map<String, dynamic>> _rows = [];
+  List<Map<String, Object?>> _rows = const [];
   String? _status;
 
   static const defaultShapeUrl = 'http://localhost:3000/v1/shape';
@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
         });
         final result = await _db!.query('widgets', orderBy: 'id ASC');
         setState(() {
-          _rows = result;
+          _rows = List<Map<String, Object?>>.from(result);
           _status = 'Connected: ${_stream.isConnected()} | UpToDate: ${_stream.isUpToDate} | Rows: ${_rows.length}';
         });
       });
@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
       });
       final result = await _db!.query('widgets', orderBy: 'id ASC');
       setState(() {
-        _rows = result;
+        _rows = List<Map<String, Object?>>.from(result);
         _status = 'Connected: ${_stream.isConnected()} | UpToDate: ${_stream.isUpToDate} | Rows: ${_rows.length}';
       });
     } catch (e) {
@@ -142,8 +142,16 @@ class _HomePageState extends State<HomePage> {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    final id = await _db!.insert('widgets', {'name': 'local-${DateTime.now().millisecondsSinceEpoch}', 'priority': 10});
-                    setState(() => _rows.add({'id': id, 'name': 'local', 'priority': 10}));
+                    final id = await _db!.insert('widgets', {
+                      'name': 'local-${DateTime.now().millisecondsSinceEpoch}',
+                      'priority': 10,
+                    });
+                    setState(() {
+                      _rows = [
+                        ..._rows,
+                        {'id': id, 'name': 'local', 'priority': 10},
+                      ];
+                    });
                   },
                   child: const Text('Insert local (sqlite)'),
                 ),

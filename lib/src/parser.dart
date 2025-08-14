@@ -76,8 +76,9 @@ class MessageParser {
   MessageParser({Map<String, ParseFunction>? parser})
       : parser = {...defaultParser, ...?parser};
 
-  T parse<T>(String messages, Schema schema) {
-    final parsed = jsonDecode(messages, reviver: (key, value) {
+  // Parse a list of messages and return as strongly typed List<Message>
+  List<Map<String, dynamic>> parseMessages(String messages, Schema schema) {
+    final decoded = jsonDecode(messages, reviver: (key, value) {
       if ((key == 'value' || key == 'old_value') && value is Map) {
         final row = value as Map<String, dynamic>;
         for (final entry in row.entries) {
@@ -86,7 +87,24 @@ class MessageParser {
       }
       return value;
     });
-    return parsed as T;
+    final list = (decoded as List)
+        .map<Map<String, dynamic>>((e) => (e as Map).cast<String, dynamic>())
+        .toList(growable: false);
+    return list;
+  }
+
+  // Parse a single message object
+  Map<String, dynamic> parseMessage(String message, Schema schema) {
+    final decoded = jsonDecode(message, reviver: (key, value) {
+      if ((key == 'value' || key == 'old_value') && value is Map) {
+        final row = value as Map<String, dynamic>;
+        for (final entry in row.entries) {
+          row[entry.key] = _parseRow(entry.key, entry.value, schema);
+        }
+      }
+      return value;
+    });
+    return (decoded as Map).cast<String, dynamic>();
   }
 
   SqlValue _parseRow(String key, SqlValue value, Schema schema) {

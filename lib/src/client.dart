@@ -378,7 +378,8 @@ class ShapeStream implements ShapeStreamInterface {
     await _onInitialResponse(res, fetchUrl);
     final schema = _schema!;
     final body = res.body.isNotEmpty ? res.body : '[]';
-    final messages = _messageParser.parse<List<Message>>(body, schema);
+    final parsed = _messageParser.parseMessages(body, schema);
+    final messages = parsed.cast<Message>();
     await _onMessages(messages);
   }
 
@@ -433,8 +434,8 @@ class ShapeStream implements ShapeStreamInterface {
             dataLines.clear();
             if (data.isNotEmpty) {
               final schema = _schema!;
-              final message = _messageParser.parse<Message>(data, schema);
-              _handleSseMessage(message);
+              final message = _messageParser.parseMessage(data, schema);
+              _handleSseMessage(message.cast<String, dynamic>());
             }
           }
         }
