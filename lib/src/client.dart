@@ -463,19 +463,6 @@ class ShapeStream implements ShapeStreamInterface {
 
   List<Message>? _sseBuffer;
 
-  void _pause() {
-    if (_started && _state == 'active') {
-      _state = 'pause-requested';
-      _requestAbortController?.abort(pauseStream);
-    }
-  }
-
-  void _resume() {
-    if (_started && _state == 'paused') {
-      _start();
-    }
-  }
-
   Future<void> forceDisconnectAndRefresh() async {
     _isRefreshing = true;
     if (_isUpToDate && !(_requestAbortController?.signal.aborted ?? true)) {
@@ -492,7 +479,7 @@ class ShapeStream implements ShapeStreamInterface {
         try {
           await Future.sync(() => callback(messages));
         } catch (err) {
-          scheduleMicrotask(() => throw err!);
+          scheduleMicrotask(() => throw err);
         }
       }
     });

@@ -118,7 +118,7 @@ class MessageParser {
       ..remove('dims');
 
     final typeParser = parser[type];
-    final SqlValue Function(SqlValue v) nullableParser = (SqlValue v) {
+    SqlValue nullableParser(SqlValue v) {
       final bool isNullable = !(columnInfo['not_null'] == true);
       if (v == null) {
         if (!isNullable) throw ParserNullValueError(key);
