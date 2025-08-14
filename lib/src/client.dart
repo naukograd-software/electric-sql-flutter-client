@@ -51,7 +51,6 @@ class ShapeStream implements ShapeStreamInterface {
   final ShapeStreamOptions options;
   Object? _error;
   final FetchClient _fetchClient;
-  final FetchClient _sseFetchClient; // kept for structure parity
   final MessageParser _messageParser;
 
   final Map<num, List<Function>> _subscribers = {};
@@ -75,12 +74,6 @@ class ShapeStream implements ShapeStreamInterface {
         _shapeHandle = options.handle,
         _messageParser = options.parser ?? MessageParser(),
         _onError = options.onError,
-        _sseFetchClient = createFetchWithResponseHeadersCheck(
-          createFetchWithBackoffClient(
-            options.fetchClient ?? _baseFetchClient,
-            options.backoffOptions ?? const BackoffOptions(),
-          ),
-        ),
         _fetchClient = createFetchWithResponseHeadersCheck(
           createFetchWithBackoffClient(
             options.fetchClient ?? _baseFetchClient,

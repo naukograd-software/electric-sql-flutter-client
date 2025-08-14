@@ -34,3 +34,9 @@ seed-worker:
 	bash tools/seed_worker.sh
 
 
+publish:
+	@echo "🚀 Publishing Flutter package to pub.dev..."
+	@flutter pub publish --dry-run
+	@echo
+	@read -p "Proceed with publishing? (y/N) " confirm && [ "$$confirm" = "y" ]
+	flutter pub publish
