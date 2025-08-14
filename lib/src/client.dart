@@ -24,7 +24,7 @@ class ShapeStreamOptions {
   ExternalHeadersRecord? headers;
   ExternalParamsRecord? params;
   final bool subscribe;
-  final bool experimentalLiveSse; // not implemented in Dart (no SSE), kept for parity
+  final bool experimentalLiveSse;
   final AbortSignal? signal;
   final BackoffOptions? backoffOptions;
   final MessageParser? parser;

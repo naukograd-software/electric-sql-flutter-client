@@ -30,4 +30,7 @@ itest:
 test-integration: up sql-init seed itest
 	@echo "Integration tests finished."
 
+seed-worker:
+	@COMPOSE_FILE=$(COMPOSE_FILE) bash tools/seed_worker.sh
+
 

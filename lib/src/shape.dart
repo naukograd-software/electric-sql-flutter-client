@@ -104,7 +104,9 @@ class Shape {
   }
 
   void _notify() {
-    for (final cb in _subscribers.values) {
+    // Iterate over a snapshot to avoid concurrent modification during callbacks
+    final callbacks = List<ShapeChangedCallback>.from(_subscribers.values);
+    for (final cb in callbacks) {
       cb(value: currentValue, rows: currentRows);
     }
   }

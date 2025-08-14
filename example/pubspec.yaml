@@ -1,0 +1,24 @@
+name: electric_sql_example
+description: Example app demonstrating electric_sql_flutter_client with sqflite_common_ffi
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.8.1
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sqflite_common_ffi: ^2.3.6
+  sqflite_common_ffi_web: ^1.0.1
+  electric_sql_flutter_client:
+    path: ..
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+
